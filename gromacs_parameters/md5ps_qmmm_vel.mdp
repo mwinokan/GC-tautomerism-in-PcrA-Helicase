@@ -1,0 +1,106 @@
+; minim.mdp - used as input into grompp to generate em.tpr
+; Parameters describing what to do, when to stop and what to save
+integrator              = md          ; leap-frog integrator
+nsteps                  = 5000       ; number of MD steps
+dt                      = 0.001       ; 1 fs
+
+nstxout                 = 100       ; save coordinates to trr
+nstvout                 = 0         ; save velocities to trr
+nstlog                  = 10        ; energies to md.log
+nstenergy               = 10        ; save energies to edr
+nstcalcenergy           = 10        ; save energies to edr
+
+; Bond parameters
+continuation            = yes        ; Restarting after NVT 
+constraint_algorithm    = lincs     ; holonomic constraints 
+constraints             = none   ; bonds involving H are constrained
+lincs_iter              = 1         ; accuracy of LINCS
+lincs_order             = 4         ; also related to accuracy
+
+; Parameters describing how to find the neighbors of each atom and how to ; lculate the interactions
+cutoff-scheme           = Verlet    ; Buffered neighbor searching
+ns_type                 = grid      ; search neighboring grid cells
+nstlist                 = 10        ; 10 fs, largely irrelevant with Verlet scheme
+rcoulomb                = 1.0       ; short-range electrostatic cutoff (in nm)
+rvdw                    = 1.0       ; short-range van der Waals cutoff (in nm)
+DispCorr                = EnerPres  ; account for cut-off vdW scheme
+coulombtype             = PME       ; Particle Mesh Ewald for long-range electrostatics
+pme_order               = 4         ; cubic interpolation
+fourierspacing          = 0.16      ; grid spacing for FFT
+pbc                     = xyz       ; 3-D PBC
+
+; Temperature coupling is on
+tcoupl                  = Nose-Hoover            ; modified Berendsen thermostat
+tc-grps                 = DNA Water_and_ions   ; two coupling groups - more accurate
+tau_t                   = 0.2 0.2           ; time constant, in ps
+ref_t                   = 310 310           ; reference temperature, one for each group, in K
+; Pressure coupling is off
+pcoupl                  = no        ; no pressure coupling in NVT
+
+; Velocity generation
+gen_vel                 = no       ; assign velocities from Maxwell distribution
+gen_temp                = 310       ; temperature for Maxwell distribution
+gen_seed                = -1        ; generate a random seed
+
+; QM/MM parameters
+qmmm-active             = true      ; activate QM/MM
+qmmm-qmgroup            = QM        ; choose QM region
+qmmm-qmmethod           = BLYP
+qmmm-qmcharge           = 0
+qmmm-qmmultiplicity     = 1
+
+; DCH41 1104
+; DCN4 1103
+; DGO6 432
+; DCN3 1101
+; DGH1 430
+; DGN1 429
+
+; restraints
+pull                    = yes
+pull_ncoords            = 4         ; four reaction coordinates
+pull_ngroups            = 6         ; six groups (individual atoms)
+
+pull_group1_name        = DCN4
+pull_group2_name        = DCH41
+pull_group3_name        = DGO6
+pull_group4_name        = DGN1
+pull_group5_name        = DGH1
+pull_group6_name        = DCN3
+
+pull-print-com          = yes ; print CoM of groups in all pulling coordinates
+pull-print-ref-value    = no ; print reference value for all coordinates
+pull-nstxout            = 1   ; print CoM's every step
+pull-nstfout            = 1   ; print CoM's every step
+
+pull_coord1_type        = umbrella  ; harmonic potential
+pull_coord1_geometry    = distance  ; simple distance increase
+pull_coord1_dim         = Y Y Y
+pull_coord1_groups      = 1 2
+pull_coord1_start       = yes       ; define initial COM distance > 0
+pull_coord1_rate        = 0.0       ; restrain in place
+pull_coord1_k           = 0       ; kJ mol^-1 nm^-2
+
+pull_coord2_type        = umbrella  ; harmonic potential
+pull_coord2_geometry    = distance  ; simple distance increase
+pull_coord2_dim         = Y Y Y
+pull_coord2_groups      = 2 3
+pull_coord2_start       = yes       ; define initial COM distance > 0
+pull_coord2_rate        = 0.0       ; restrain in place
+pull_coord2_k           = 0       ; kJ mol^-1 nm^-2
+
+pull_coord3_type        = umbrella  ; harmonic potential
+pull_coord3_geometry    = distance  ; simple distance increase
+pull_coord3_dim         = Y Y Y
+pull_coord3_groups      = 4 5
+pull_coord3_start       = yes       ; define initial COM distance > 0
+pull_coord3_rate        = 0.0       ; restrain in place
+pull_coord3_k           = 0       ; kJ mol^-1 nm^-2
+
+pull_coord4_type        = umbrella  ; harmonic potential
+pull_coord4_geometry    = distance  ; simple distance increase
+pull_coord4_dim         = Y Y Y
+pull_coord4_groups      = 5 6
+pull_coord4_start       = yes       ; define initial COM distance > 0
+pull_coord4_rate        = 0.0       ; restrain in place
+pull_coord4_k           = 0       ; kJ mol^-1 nm^-2
