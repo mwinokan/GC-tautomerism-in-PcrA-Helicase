@@ -1,0 +1,58 @@
+; Parameters describing what to do, when to stop and what to save
+integrator              = md         ; leap-frog integrator
+nsteps                  = 50000      ; 50ps
+dt                      = 0.001      ; 1 fs
+
+nstxout                 = 100        ; save coordinates to trr
+nstvout                 = 0          ; save velocities to trr
+nstlog                  = 1          ; energies to md.log
+nstenergy               = 1          ; save energies to edr
+nstcalcenergy           = 1          ; save energies to edr
+ 
+; Bond parameters
+constraints             = none       ; no bonds constrained
+
+; Parameters describing how to find the neighbors of each atom and how to ; lculate the interactions
+cutoff-scheme           = Verlet    ; Buffered neighbor searching
+ns_type                 = grid      ; search neighboring grid cells
+nstlist                 = 10        ; 10 fs, largely irrelevant with Verlet scheme
+rcoulomb                = 1.0       ; short-range electrostatic cutoff (in nm)
+rvdw                    = 1.0       ; short-range van der Waals cutoff (in nm)
+DispCorr                = EnerPres  ; account for cut-off vdW scheme
+coulombtype             = PME       ; Particle Mesh Ewald for long-range electrostatics
+pme_order               = 4         ; cubic interpolation
+fourierspacing          = 0.16      ; grid spacing for FFT
+pbc                     = xyz       ; 3-D PBC
+
+; Temperature coupling is on
+tcoupl                  = Nose-Hoover
+tc-grps                 = DNA Protein ATP Water_and_ions
+tau_t                   = 0.2 0.2 0.2 0.2
+ref_t                   = 310 310 310 310
+pcoupl                  = no
+
+continuation            = yes        ; Continuing after NVT 
+
+; PULL: DG663:N9 and DC702:N1 directly apart
+
+
+; restraints
+pull                    = yes
+pull_ncoords            = 1         ; one pulling coordinate
+pull_ngroups            = 2         ; two single atom groups
+
+pull_group1_name        = DGN9
+pull_group2_name        = DCN1
+
+pull-print-com          = no ; print CoM of groups in all pulling coordinates
+pull-print-ref-value    = no  ; print reference value for all coordinates
+pull-nstxout            = 1   ; print CoM's every step
+pull-nstfout            = 1   ; print CoM's every step
+
+pull_coord1_type        = constant-force
+pull_coord1_geometry    = distance
+pull_coord1_dim         = Y Y Y
+pull_coord1_groups      = 1 2
+pull_coord1_start       = yes
+pull_coord1_rate        = 0.0
+pull_coord1_k           = -1000
