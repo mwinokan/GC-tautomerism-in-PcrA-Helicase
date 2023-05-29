@@ -1,7 +1,7 @@
 ; minim.mdp - used as input into grompp to generate em.tpr
 ; Parameters describing what to do, when to stop and what to save
 integrator              = md          ; leap-frog integrator
-nsteps                  = 1       ; number of MD steps
+nsteps                  = 8000       ; number of MD steps
 dt                      = 0.001       ; 1 fs
 
 nstxout                 = 5000       ; save coordinates to trr
