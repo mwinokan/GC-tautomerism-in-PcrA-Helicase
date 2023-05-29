@@ -1,0 +1,193 @@
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT __PROJECT__
+  RUN_TYPE ENERGY
+&END GLOBAL
+&FORCE_EVAL
+  METHOD QMMM
+  &DFT
+    CHARGE 0
+    MULTIPLICITY 1
+    BASIS_SET_FILE_NAME  BASIS_MOLOPT
+    BASIS_SET_FILE_NAME  BASIS_ADMM
+    POTENTIAL_FILE_NAME  POTENTIAL
+&MGRID
+      NGRIDS 5
+      CUTOFF 500
+      REL_CUTOFF 90
+      COMMENSURATE
+    &END MGRID
+    &SCF
+      SCF_GUESS ATOMIC
+      EPS_SCF 5.0E-8
+      MAX_SCF 20
+      &OT  T
+        MINIMIZER  DIIS
+        STEPSIZE   0.15
+        PRECONDITIONER FULL_ALL
+      &END OT
+      &OUTER_SCF  T
+        MAX_SCF 20
+        EPS_SCF 5.0E-8
+      &END OUTER_SCF
+    &END SCF
+    &XC
+      DENSITY_CUTOFF     1.0E-12
+      GRADIENT_CUTOFF    1.0E-12
+      TAU_CUTOFF         1.0E-12
+         &XC_FUNCTIONAL
+      &LYP
+         SCALE_C 0.81          ! 81% LYP correlation
+      &END
+      &BECKE88
+         SCALE_X 0.72          ! 72% Becke88 exchange
+      &END
+      &VWN
+         FUNCTIONAL_TYPE VWN3
+         SCALE_C 0.19          ! 19% LDA correlation
+      &END
+      &XALPHA
+         SCALE_X 0.08          ! 8%  LDA exchange
+      &END
+    &END XC_FUNCTIONAL
+    &HF
+      FRACTION 0.20            ! 20% HF exchange
+        &SCREENING
+          ! important parameter to get stable HFX calcs
+          EPS_SCHWARZ 1.0E-6
+          ! needs a good (GGA) initial guess 
+          SCREEN_ON_INITIAL_P TRUE
+        &END
+        &INTERACTION_POTENTIAL
+          ! for condensed phase systems
+          POTENTIAL_TYPE TRUNCATED
+          ! should be less than halve the cell
+          CUTOFF_RADIUS 4.0
+          ! data file needed with the truncated operator
+          T_C_G_DATA ./t_c_g.dat
+        &END
+      &MEMORY
+         MAX_MEMORY  1500     ! In MB per MPI rank
+      &END
+    &END HF
+
+    &VDW_POTENTIAL
+         POTENTIAL_TYPE PAIR_POTENTIAL
+         &PAIR_POTENTIAL
+            PARAMETER_FILE_NAME dftd3.dat
+            TYPE DFTD3
+            REFERENCE_FUNCTIONAL B3LYP
+            R_CUTOFF [angstrom] 16
+         &END
+      &END VDW_POTENTIAL
+
+    &END XC
+    &QS
+     METHOD GPW
+     EPS_DEFAULT 1.0E-10
+     EPS_FILTER_MATRIX 0.00000000E+000
+     EPS_PGF_ORB 1.0E-10
+     EXTRAPOLATION ASPC
+     EXTRAPOLATION_ORDER  4
+    &END QS
+    &AUXILIARY_DENSITY_MATRIX_METHOD
+      METHOD BASIS_PROJECTION
+      ADMM_PURIFICATION_METHOD MO_DIAG
+    &END
+  &END DFT
+  &QMMM
+    &CELL
+      A 16.500 0.000 0.000
+      B 0.000 17.340 0.000
+      C 0.000 0.000 12.220
+      PERIODIC XYZ
+    &END CELL
+    CENTER EVERY_STEP
+    CENTER_TYPE PBC_AWARE_MAX_MINUS_MIN
+    ECOUPL GAUSS
+    USE_GEEP_LIB 12
+    &PERIODIC
+      GMAX     1.0E+00
+      &MULTIPOLE ON
+         RCUT     1.0E+01
+         EWALD_PRECISION     1.0E-06
+      &END
+    &END PERIODIC
+    &QM_KIND H  
+      MM_INDEX 10932 10933 10937 10943 11663 11665 11671 11672
+    &END QM_KIND
+    &QM_KIND C  
+      MM_INDEX 10930 10935 10938 10940 10942 11662 11664 11666 11669
+    &END QM_KIND
+    &QM_KIND N  
+      MM_INDEX 10929 10931 10934 10936 10941 11661 11668 11670
+    &END QM_KIND
+    &QM_KIND O  
+      MM_INDEX 10939 11667
+    &END QM_KIND
+    &LINK
+      QM_INDEX 10929
+      MM_INDEX 10927
+    &END LINK
+    &LINK
+      QM_INDEX 11661
+      MM_INDEX 11659
+    &END LINK
+  &END QMMM
+  &MM
+    &FORCEFIELD
+      DO_NONBONDED FALSE
+    &END FORCEFIELD
+    &POISSON
+      &EWALD
+        EWALD_TYPE NONE
+      &END EWALD
+    &END POISSON
+  &END MM
+  &SUBSYS
+    &CELL
+      A 146.314 0.000 0.000
+      B 0.000 146.314 0.000
+      C 0.000 0.000 146.314
+      PERIODIC XYZ
+    &END CELL
+    &TOPOLOGY
+      COORD_FILE_NAME __COORD_FILE_NAME__
+      COORD_FILE_FORMAT PDB
+      CHARGE_EXTENDED TRUE
+      CONNECTIVITY OFF
+      &GENERATE
+         &ISOLATED_ATOMS
+            LIST 1..307483
+         &END
+      &END GENERATE
+    &END TOPOLOGY
+    &KIND H  
+      ELEMENT H  
+      BASIS_SET DZVP-MOLOPT-GTH
+      BASIS_SET AUX_FIT cFIT3
+      POTENTIAL GTH-BLYP
+    &END KIND
+    &KIND C  
+      ELEMENT C  
+      BASIS_SET DZVP-MOLOPT-GTH
+      BASIS_SET AUX_FIT cFIT3
+      POTENTIAL GTH-BLYP
+    &END KIND
+    &KIND N  
+      ELEMENT N  
+      BASIS_SET DZVP-MOLOPT-GTH
+      BASIS_SET AUX_FIT cFIT3
+      POTENTIAL GTH-BLYP
+    &END KIND
+    &KIND O  
+      ELEMENT O  
+      BASIS_SET DZVP-MOLOPT-GTH
+      BASIS_SET AUX_FIT cFIT3
+      POTENTIAL GTH-BLYP
+    &END KIND
+    &KIND X
+      ELEMENT H
+    &END KIND
+  &END SUBSYS
+&END FORCE_EVAL
